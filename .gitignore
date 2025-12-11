@@ -29,10 +29,10 @@ coverage/
 # nyc test coverage
 .nyc_output/
 
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+# Grunt intermediate storage
 .grunt/
 
-# Bower dependency directory (https://bower.io/)
+# Bower dependency directory
 bower_components/
 
 # IDE specific files
@@ -66,3 +66,7 @@ Thumbs.db
 # WhatsApp Web JS auth and cache
 .wwebjs_auth/
 .wwebjs_cache/
+
+# Local development files
+*.local
+*.dev
