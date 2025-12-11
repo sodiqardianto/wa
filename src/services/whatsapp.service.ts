@@ -3,6 +3,7 @@ import { APP_CONFIG } from "../config/app.config";
 import { QRUtils } from "../utils/qr.utils";
 
 export class WhatsAppService {
+  private static instance: WhatsAppService;
   private client: Client;
   private isClientReady: boolean = false;
   private autoReplyEnabled: boolean = false;
@@ -61,6 +62,13 @@ export class WhatsAppService {
     });
   }
 
+  public static getInstance(): WhatsAppService {
+    if (!WhatsAppService.instance) {
+      WhatsAppService.instance = new WhatsAppService();
+    }
+    return WhatsAppService.instance;
+  }
+
   public initialize(): void {
     this.client.initialize();
   }
@@ -79,14 +87,32 @@ export class WhatsAppService {
     );
   }
 
-  public async sendMessage(phoneNumber: string, message: string): Promise<any> {
+  public async sendChat(phoneNumber: string, message: string): Promise<any> {
     if (!this.isClientReady) {
       throw new Error(
         "WhatsApp client is not ready. Please scan QR code first."
       );
     }
 
-    const chatId = phoneNumber.replace(/\+/g, "") + "@c.us";
-    return await this.client.sendMessage(chatId, message);
+    // Format phone number properly
+    let formattedNumber = phoneNumber.replace(/\D/g, ""); // Remove all non-digits
+    
+    // Add country code if not present (assuming Indonesia +62)
+    if (formattedNumber.startsWith("0")) {
+      formattedNumber = "62" + formattedNumber.substring(1);
+    } else if (!formattedNumber.startsWith("62")) {
+      formattedNumber = "62" + formattedNumber;
+    }
+
+    const chatId = formattedNumber + "@c.us";
+    console.log(`📱 Sending chat to: ${chatId}`);
+    
+    // Check if number exists on WhatsApp first
+    const numberId = await this.client.getNumberId(chatId);
+    if (!numberId) {
+      throw new Error(`Phone number ${phoneNumber} is not registered on WhatsApp`);
+    }
+
+    return await this.client.sendMessage(numberId._serialized, message);
   }
 }

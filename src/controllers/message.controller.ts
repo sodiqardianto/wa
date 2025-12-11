@@ -6,10 +6,10 @@ export class MessageController {
   private whatsAppService: WhatsAppService;
 
   constructor() {
-    this.whatsAppService = new WhatsAppService();
+    this.whatsAppService = WhatsAppService.getInstance();
   }
 
-  async sendMessage(req: Request, res: Response): Promise<void> {
+  async sendChat(req: Request, res: Response): Promise<void> {
     try {
       const { phoneNumber, message } = req.body;
 
@@ -31,22 +31,19 @@ export class MessageController {
         return;
       }
 
-      // Format phone number for WhatsApp
-      const chatId = phoneNumber.replace(/\+/g, "") + "@c.us";
+      // Send chat (WhatsAppService will handle phone number formatting)
+      const result = await this.whatsAppService.sendChat(phoneNumber, message);
 
-      // Send message
-      const result = await this.whatsAppService.sendMessage(chatId, message);
-
-      ApiUtils.successResponse(res, "Message sent successfully", {
+      ApiUtils.successResponse(res, "Chat sent successfully", {
         messageId: result.id._serialized,
         timestamp: new Date().toISOString(),
         to: phoneNumber,
       });
     } catch (error) {
-      console.error("❌ Error sending message:", error);
+      console.error("❌ Error sending chat:", error);
       ApiUtils.errorResponse(
         res,
-        "Failed to send message",
+        "Failed to send chat",
         error instanceof Error ? error.message : "Unknown error"
       );
     }

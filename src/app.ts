@@ -11,7 +11,7 @@ class App {
 
   constructor() {
     this.app = express();
-    this.whatsAppService = new WhatsAppService();
+    this.whatsAppService = WhatsAppService.getInstance();
     this.configureMiddleware();
     this.configureRoutes();
   }
@@ -28,11 +28,11 @@ class App {
   public start(): void {
     this.app.listen(APP_CONFIG.port, () => {
       console.log(`\n========================================`);
-      console.log(`🚀 WhatsApp Service`);
+      console.log(`🚀 WhatsApp Service (Auto-reload enabled)`);
       console.log(`========================================`);
       console.log(`Server: http://localhost:${APP_CONFIG.port}`);
       console.log(`Health: http://localhost:${APP_CONFIG.port}/health`);
-      console.log(`Send OTP: http://localhost:${APP_CONFIG.port}/send-otp`);
+      console.log(`Send Chat: http://localhost:${APP_CONFIG.port}/send-chat`);
       console.log(`========================================\n`);
       console.log("⏳ Waiting for WhatsApp client to be ready...");
       console.log("📱 Please scan QR code if prompted\n");
